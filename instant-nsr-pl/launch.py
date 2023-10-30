@@ -5,6 +5,10 @@ import time
 import logging
 from datetime import datetime
 
+import torch
+
+torch.cuda.set_per_process_memory_fraction(0.25)
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -48,12 +52,11 @@ def main():
     config = load_config(args.config, cli_args=extras)
     config.cmd_args = vars(args)
 
-    config.trial_name = config.get('trial_name') or (config.tag + datetime.now().strftime('@%Y%m%d-%H%M%S'))
     config.exp_dir = config.get('exp_dir') or os.path.join(args.exp_dir, config.name)
-    config.save_dir = config.get('save_dir') or os.path.join(config.exp_dir, config.trial_name, 'save')
-    config.ckpt_dir = config.get('ckpt_dir') or os.path.join(config.exp_dir, config.trial_name, 'ckpt')
-    config.code_dir = config.get('code_dir') or os.path.join(config.exp_dir, config.trial_name, 'code')
-    config.config_dir = config.get('config_dir') or os.path.join(config.exp_dir, config.trial_name, 'config')
+    config.save_dir = config.get('save_dir') or os.path.join(config.exp_dir, 'save')
+    config.ckpt_dir = config.get('ckpt_dir') or os.path.join(config.exp_dir, 'ckpt')
+    config.code_dir = config.get('code_dir') or os.path.join(config.exp_dir, 'code')
+    config.config_dir = config.get('config_dir') or os.path.join(config.exp_dir, 'config')
 
     logger = logging.getLogger('pytorch_lightning')
     if args.verbose:
@@ -67,28 +70,28 @@ def main():
     system = systems.make(config.system.name, config, load_from_checkpoint=None if not args.resume_weights_only else args.resume)
 
     callbacks = []
-    if args.train:
-        callbacks += [
-            ModelCheckpoint(
-                dirpath=config.ckpt_dir,
-                **config.checkpoint
-            ),
-            LearningRateMonitor(logging_interval='step'),
-            CodeSnapshotCallback(
-                config.code_dir, use_version=False
-            ),
-            ConfigSnapshotCallback(
-                config, config.config_dir, use_version=False
-            ),
-            CustomProgressBar(refresh_rate=1),
-        ]
+    # if args.train:
+    #     callbacks += [
+    #         ModelCheckpoint(
+    #             dirpath=config.ckpt_dir,
+    #             **config.checkpoint
+    #         ),
+    #         LearningRateMonitor(logging_interval='step'),
+    #         CodeSnapshotCallback(
+    #             config.code_dir, use_version=False
+    #         ),
+    #         ConfigSnapshotCallback(
+    #             config, config.config_dir, use_version=False
+    #         ),
+    #         CustomProgressBar(refresh_rate=1),
+    #     ]
 
     loggers = []
-    if args.train:
-        loggers += [
-            TensorBoardLogger(args.runs_dir, name=config.name, version=config.trial_name),
-            CSVLogger(config.exp_dir, name=config.trial_name, version='csv_logs')
-        ]
+    # if args.train:
+    #     loggers += [
+    #         TensorBoardLogger(args.runs_dir, name=config.name, version=config.trial_name),
+    #         CSVLogger(config.exp_dir, name=config.trial_name, version='csv_logs')
+    #     ]
     
     if sys.platform == 'win32':
         # does not support multi-gpu on windows

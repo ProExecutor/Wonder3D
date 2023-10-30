@@ -2,13 +2,13 @@ pretrained_model_name_or_path: 'lambdalabs/sd-image-variations-diffusers'
 pretrained_unet_path: './ckpts/'
 revision: null
 validation_dataset:
-  root_dir: "./example_images" # the folder path stores testing images
+  root_dir: "/data/test_set/debug-v1.2.1" # the folder path stores testing images
   num_views: 6
   bg_color: 'white'
   img_wh: [256, 256]
   num_validation_samples: 1000
   crop_size: 192
-  filepaths: ['owl.png']  # the test image names. leave it empty, test all images in the folder
+  filepaths: ['monkey_rgba.png']  # the test image names. leave it empty, test all images in the folder
 
 save_dir: 'outputs/'
 

@@ -177,7 +177,7 @@ tags
 *.ckpt
 
 outputs/*
-
+instant-nsr-pl/exp/*
 NeuS/exp/*
 NeuS/test_scenes/*
 NeuS/mesh2tex/*

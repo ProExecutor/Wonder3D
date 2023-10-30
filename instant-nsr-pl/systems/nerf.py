@@ -205,7 +205,7 @@ class NeRFSystem(BaseSystem):
                 f"it{self.global_step}-test",
                 '(\d+)\.png',
                 save_format='mp4',
-                fps=30
+                fps=10
             )
             
             self.export()

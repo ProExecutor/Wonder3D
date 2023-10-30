@@ -1,51 +1,27 @@
 import argparse
-import datetime
-import logging
-import inspect
-import math
 import os
-from typing import Dict, Optional, Tuple, List
-from omegaconf import OmegaConf
-from PIL import Image
-import cv2
-import numpy as np
+from collections import defaultdict
 from dataclasses import dataclass
 from packaging import version
-import shutil
-from collections import defaultdict
+from typing import Dict, Optional, List
 
 import torch
-import torch.nn.functional as F
-import torch.utils.checkpoint
-import torchvision.transforms.functional as TF
-from torchvision.utils import make_grid, save_image
-
-import transformers
-import accelerate
-from accelerate import Accelerator
-from accelerate.logging import get_logger
-from accelerate.utils import ProjectConfiguration, set_seed
-
-import diffusers
-from diffusers import AutoencoderKL, DDPMScheduler, DDIMScheduler, StableDiffusionPipeline, UNet2DConditionModel
-from diffusers.optimization import get_scheduler
-from diffusers.training_utils import EMAModel
-from diffusers.utils import check_min_version, deprecate, is_wandb_available
+from accelerate.utils import set_seed
+from diffusers import AutoencoderKL, DDIMScheduler
 from diffusers.utils.import_utils import is_xformers_available
-
+from einops import rearrange
+from omegaconf import OmegaConf
+from PIL import Image
+from rembg import remove
+from torchvision.utils import save_image
 from tqdm.auto import tqdm
-from transformers import CLIPTextModel, CLIPTokenizer
 from transformers import CLIPImageProcessor, CLIPVisionModelWithProjection
 
-from mvdiffusion.models.unet_mv2d_condition import UNetMV2DConditionModel
-
 from mvdiffusion.data.single_image_dataset import SingleImageDataset as MVDiffusionDataset
-
+from mvdiffusion.models.unet_mv2d_condition import UNetMV2DConditionModel
 from mvdiffusion.pipelines.pipeline_mvdiffusion_image import MVDiffusionImagePipeline
 
-from einops import rearrange
-from rembg import remove
-import pdb
+torch.cuda.set_per_process_memory_fraction(0.25)
 
 
 @dataclass
@@ -321,7 +297,7 @@ if __name__ == '__main__':
 
     # parse YAML config to OmegaConf
     cfg = load_config(args.config, cli_args=extras)
-    print(cfg)
+    # print(cfg)
     schema = OmegaConf.structured(TestConfig)
     # cfg = OmegaConf.load(args.config)
     cfg = OmegaConf.merge(schema, cfg)

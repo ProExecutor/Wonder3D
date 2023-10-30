@@ -1,30 +1,14 @@
-from typing import Dict
-import numpy as np
-from omegaconf import DictConfig, ListConfig
-import torch
-from torch.utils.data import Dataset
-from pathlib import Path
-import json
-from PIL import Image
-from torchvision import transforms
-from einops import rearrange
-from typing import Literal, Tuple, Optional, Any
-import cv2
-import random
-
-import json
-import os, sys
 import math
-
-from glob import glob
-
-import PIL.Image
-from .normal_utils import trans_normal, normal2img, img2normal
-import pdb
-
+import os
+from pathlib import Path
+from typing import Tuple, Optional
 
 import cv2
 import numpy as np
+import torch
+from PIL import Image
+from torch.utils.data import Dataset
+
 
 def add_margin(pil_img, color=0, size=256):
     width, height = pil_img.size
@@ -287,9 +271,9 @@ class SingleImageDataset(Dataset):
         img_tensors_in = torch.stack(img_tensors_in, dim=0).float() # (Nv, 3, H, W)
         alpha_tensors_in = torch.stack(alpha_tensors_in, dim=0).float() # (Nv, 3, H, W)
 
-        elevations = torch.as_tensor(elevations).float().squeeze(1)
-        azimuths = torch.as_tensor(azimuths).float().squeeze(1)
-        elevations_cond = torch.as_tensor([0] * self.num_views).float()
+        elevations = torch.from_numpy(np.array(elevations)).float().squeeze(1)
+        azimuths = torch.from_numpy(np.array(azimuths)).float().squeeze(1)
+        elevations_cond = torch.from_numpy(np.array([0] * self.num_views)).float()
 
         normal_class = torch.tensor([1, 0]).float()
         normal_task_embeddings = torch.stack([normal_class]*self.num_views, dim=0)  # (Nv, 2)

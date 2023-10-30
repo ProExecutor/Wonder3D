@@ -188,7 +188,7 @@ class SaverMixin():
     def save_state_dict(self, filename, data):
         torch.save(data, self.get_save_path(filename))
     
-    def save_img_sequence(self, filename, img_dir, matcher, save_format='gif', fps=30):
+    def save_img_sequence(self, filename, img_dir, matcher, save_format='gif', fps=10):
         assert save_format in ['gif', 'mp4']
         if not filename.endswith(save_format):
             filename += f".{save_format}"

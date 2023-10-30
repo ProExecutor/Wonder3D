@@ -231,13 +231,14 @@ class OrthoNeuSSystem(BaseSystem):
             loss_ = value * self.C(self.config.system.loss[f"lambda_{name}"])
             loss += loss_
         
-        self.log('train/inv_s', out['inv_s'], prog_bar=True)
+        # NOTE(vincent): don't log extra things
+        # self.log('train/inv_s', out['inv_s'], prog_bar=True)
 
-        for name, value in self.config.system.loss.items():
-            if name.startswith('lambda'):
-                self.log(f'train_params/{name}', self.C(value))
+        # for name, value in self.config.system.loss.items():
+        #     if name.startswith('lambda'):
+        #         self.log(f'train_params/{name}', self.C(value))
 
-        self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
+        # self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
 
         return {
             'loss': loss
@@ -256,23 +257,25 @@ class OrthoNeuSSystem(BaseSystem):
     """
     
     def validation_step(self, batch, batch_idx):
-        out = self(batch)
-        psnr = self.criterions['psnr'](out['comp_rgb_full'].to(batch['rgb']), batch['rgb'])
-        W, H = self.dataset.img_wh
-        self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
-            {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'rgb', 'img': out['comp_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
-        ] + ([
-            {'type': 'rgb', 'img': out['comp_rgb_bg'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-        ] if self.config.model.learned_background else []) + [
-            {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
-            {'type': 'rgb', 'img': out['comp_normal'].view(H, W, 3), 'kwargs': {'data_format': 'HWC', 'data_range': (-1, 1)}}
-        ])
-        return {
-            'psnr': psnr,
-            'index': batch['index']
-        }
+        # NOTE(vincent): just save the mesh during testing
+        # out = self(batch)
+        # psnr = self.criterions['psnr'](out['comp_rgb_full'].to(batch['rgb']), batch['rgb'])
+        # W, H = self.dataset.img_wh
+        # self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
+        #     {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #     {'type': 'rgb', 'img': out['comp_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
+        # ] + ([
+        #     {'type': 'rgb', 'img': out['comp_rgb_bg'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #     {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        # ] if self.config.model.learned_background else []) + [
+        #     {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
+        #     {'type': 'rgb', 'img': out['comp_normal'].view(H, W, 3), 'kwargs': {'data_format': 'HWC', 'data_range': (-1, 1)}}
+        # ])
+        # return {
+        #     'psnr': psnr,
+        #     'index': batch['index']
+        # }
+        pass
           
     
     """
@@ -282,24 +285,27 @@ class OrthoNeuSSystem(BaseSystem):
     """
     
     def validation_epoch_end(self, out):
-        out = self.all_gather(out)
-        if self.trainer.is_global_zero:
-            out_set = {}
-            for step_out in out:
-                # DP
-                if step_out['index'].ndim == 1:
-                    out_set[step_out['index'].item()] = {'psnr': step_out['psnr']}
-                # DDP
-                else:
-                    for oi, index in enumerate(step_out['index']):
-                        out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-            psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
-            self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)
-        self.export()       
+        # NOTE(vincent): just save the mesh during testing
+        # out = self.all_gather(out)
+        # if self.trainer.is_global_zero:
+        #     out_set = {}
+        #     for step_out in out:
+        #         # DP
+        #         if step_out['index'].ndim == 1:
+        #             out_set[step_out['index'].item()] = {'psnr': step_out['psnr']}
+        #         # DDP
+        #         else:
+        #             for oi, index in enumerate(step_out['index']):
+        #                 out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+        #     psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
+        #     self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)
+        # self.export()
+        pass
 
     def test_step(self, batch, batch_idx):
         out = self(batch)
-        psnr = self.criterions['psnr'](out['comp_rgb_full'].to(batch['rgb']), batch['rgb'])
+        # NOTE(vincent): disable psnr computation for speed
+        # psnr = self.criterions['psnr'](out['comp_rgb_full'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
         self.save_image_grid(f"it{self.global_step}-test/{batch['index'][0].item()}.png", [
             {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
@@ -312,7 +318,7 @@ class OrthoNeuSSystem(BaseSystem):
             {'type': 'rgb', 'img': out['comp_normal'].view(H, W, 3), 'kwargs': {'data_format': 'HWC', 'data_range': (-1, 1)}}
         ])
         return {
-            'psnr': psnr,
+            # 'psnr': psnr,
             'index': batch['index']
         }      
     
@@ -323,24 +329,25 @@ class OrthoNeuSSystem(BaseSystem):
         """
         out = self.all_gather(out)
         if self.trainer.is_global_zero:
-            out_set = {}
-            for step_out in out:
-                # DP
-                if step_out['index'].ndim == 1:
-                    out_set[step_out['index'].item()] = {'psnr': step_out['psnr']}
-                # DDP
-                else:
-                    for oi, index in enumerate(step_out['index']):
-                        out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-            psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
-            self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)    
+            # NOTE(vincent): disable metrics for speed
+            # out_set = {}
+            # for step_out in out:
+            #     # DP
+            #     if step_out['index'].ndim == 1:
+            #         out_set[step_out['index'].item()] = {'psnr': step_out['psnr']}
+            #     # DDP
+            #     else:
+            #         for oi, index in enumerate(step_out['index']):
+            #             out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+            # psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
+            # self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)    
 
             self.save_img_sequence(
                 f"it{self.global_step}-test",
                 f"it{self.global_step}-test",
                 '(\d+)\.png',
                 save_format='mp4',
-                fps=30
+                fps=10
             )
             
             self.export()

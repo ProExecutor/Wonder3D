@@ -1,9 +1,5 @@
 import os
-import json
-import math
 import numpy as np
-from PIL import Image
-import cv2
 
 import torch
 import torch.nn.functional as F
@@ -103,7 +99,7 @@ def load_a_prediction(root_dir, test_object, imSize, view_types, load_color=Fals
     for idx, view in enumerate(view_types):
         print(os.path.join(root_dir,test_object))
         normal_filepath = os.path.join(root_dir, test_object, 'normals_000_%s.png'%( view))
-        # Load key frame
+        # Load key frames
         if load_color:  # use bgr
             image =np.array(PIL.Image.open(normal_filepath.replace("normals", "rgb")).resize(imSize))[:, :, :3]
 
