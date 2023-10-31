@@ -52,16 +52,3 @@ end_time=$(date +%s)
 elapsed_time=$((end_time - start_time))
 echo "Nerf fit: $elapsed_time seconds"
 
-cd ../kiuikit
-python -m kiui.render \
-  "../Wonder3D/instant-nsr-pl/exp/mesh-ortho-$job_name/save/it2000-mc192.obj" \
-  --save "../Wonder3D/instant-nsr-pl/exp/mesh-ortho-$job_name/save/mesh" \
-  --wogui \
-  --force_cuda_rast \
-  --W 512 --H 512 \
-  --front_dir "/-y" \
-  --mesh_front_dir "+y" \
-  --mesh_export \
-  --num_azimuth 36 \
-  --radius 3.0 \
-  --fovy 50
