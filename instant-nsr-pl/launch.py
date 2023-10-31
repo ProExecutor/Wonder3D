@@ -3,11 +3,9 @@ import argparse
 import os
 import time
 import logging
-from datetime import datetime
 
-import torch
-
-torch.cuda.set_per_process_memory_fraction(0.25)
+# import torch
+# torch.cuda.set_per_process_memory_fraction(0.25)
 
 
 def main():
@@ -37,15 +35,16 @@ def main():
     # set CUDA_VISIBLE_DEVICES then import pytorch-lightning
     os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-    n_gpus = len(args.gpu.split(','))
+    # n_gpus = len(args.gpu.split(','))
+    n_gpus = 1  # NOTE(vincent) this should just work on 1 GPU
 
     import datasets
     import systems
     import pytorch_lightning as pl
     from pytorch_lightning import Trainer
-    from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
-    from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
-    from utils.callbacks import CodeSnapshotCallback, ConfigSnapshotCallback, CustomProgressBar
+    # from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
+    # from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
+    # from utils.callbacks import CodeSnapshotCallback, ConfigSnapshotCallback, CustomProgressBar
     from utils.misc import load_config    
 
     # parse YAML config to OmegaConf

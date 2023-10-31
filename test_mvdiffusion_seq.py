@@ -21,7 +21,7 @@ from mvdiffusion.data.single_image_dataset import SingleImageDataset as MVDiffus
 from mvdiffusion.models.unet_mv2d_condition import UNetMV2DConditionModel
 from mvdiffusion.pipelines.pipeline_mvdiffusion_image import MVDiffusionImagePipeline
 
-torch.cuda.set_per_process_memory_fraction(0.25)
+# torch.cuda.set_per_process_memory_fraction(0.25)
 
 
 @dataclass
