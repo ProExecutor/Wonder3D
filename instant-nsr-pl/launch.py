@@ -42,7 +42,7 @@ def main():
     import systems
     import pytorch_lightning as pl
     from pytorch_lightning import Trainer
-    # from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
+    from pytorch_lightning.callbacks import ModelCheckpoint
     # from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
     # from utils.callbacks import CodeSnapshotCallback, ConfigSnapshotCallback, CustomProgressBar
     from utils.misc import load_config    
@@ -69,21 +69,21 @@ def main():
     system = systems.make(config.system.name, config, load_from_checkpoint=None if not args.resume_weights_only else args.resume)
 
     callbacks = []
-    # if args.train:
-    #     callbacks += [
-    #         ModelCheckpoint(
-    #             dirpath=config.ckpt_dir,
-    #             **config.checkpoint
-    #         ),
-    #         LearningRateMonitor(logging_interval='step'),
-    #         CodeSnapshotCallback(
-    #             config.code_dir, use_version=False
-    #         ),
-    #         ConfigSnapshotCallback(
-    #             config, config.config_dir, use_version=False
-    #         ),
-    #         CustomProgressBar(refresh_rate=1),
-    #     ]
+    if args.train:
+        callbacks += [
+            ModelCheckpoint(
+                dirpath=config.ckpt_dir,
+                **config.checkpoint
+            ),
+            # LearningRateMonitor(logging_interval='step'),
+            # CodeSnapshotCallback(
+            #     config.code_dir, use_version=False
+            # ),
+            # ConfigSnapshotCallback(
+            #     config, config.config_dir, use_version=False
+            # ),
+            # CustomProgressBar(refresh_rate=1),
+        ]
 
     loggers = []
     # if args.train:

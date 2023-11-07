@@ -17,9 +17,8 @@ def compute_latent_worker(fns, indices):
     """Runs unittests for elevation estimation."""
     images = fns[indices]
     for image in images:
-        name = os.path.basename(image).replace("_rgba.png", "")
         command = f"""
-            bash run_wonder3d.sh --image_path {image} --foldername {name}
+            bash run_wonder3d.sh --image_path {image}
         """
         subprocess.run(command, shell=True, check=True)
 
@@ -29,6 +28,16 @@ def main():
     num_workers = int(num_gpus // GPU_WORKER_FRAC)
 
     images = sorted(glob.glob(os.path.join(TEST_SET, "*_rgba.png")))
+
+    # filter
+    filtered_images = []
+    for image in images:
+        name = os.path.basename(image).replace(".png", "")
+        ckpt_path = os.path.join(os.getcwd(), "instant-nsr-pl", "exp", f"mesh-ortho-{name}", "ckpt", "epoch=0-step=2000.ckpt")
+        if not os.path.exists(ckpt_path):
+            filtered_images.append(image)
+    images = filtered_images
+    breakpoint()
 
     images = np.array(images)
     all_indxs = range(0, len(images))
