@@ -69,21 +69,21 @@ def main():
     system = systems.make(config.system.name, config, load_from_checkpoint=None if not args.resume_weights_only else args.resume)
 
     callbacks = []
-    if args.train:
-        callbacks += [
-            ModelCheckpoint(
-                dirpath=config.ckpt_dir,
-                **config.checkpoint
-            ),
-            # LearningRateMonitor(logging_interval='step'),
-            # CodeSnapshotCallback(
-            #     config.code_dir, use_version=False
-            # ),
-            # ConfigSnapshotCallback(
-            #     config, config.config_dir, use_version=False
-            # ),
-            # CustomProgressBar(refresh_rate=1),
-        ]
+    # if args.train:
+    #     callbacks += [
+    #         ModelCheckpoint(
+    #             dirpath=config.ckpt_dir,
+    #             **config.checkpoint
+    #         ),
+    #         # LearningRateMonitor(logging_interval='step'),
+    #         # CodeSnapshotCallback(
+    #         #     config.code_dir, use_version=False
+    #         # ),
+    #         # ConfigSnapshotCallback(
+    #         #     config, config.config_dir, use_version=False
+    #         # ),
+    #         # CustomProgressBar(refresh_rate=1),
+    #     ]
 
     loggers = []
     # if args.train:
@@ -114,7 +114,7 @@ def main():
             trainer.fit(system, datamodule=dm, ckpt_path=args.resume)
         else:
             trainer.fit(system, datamodule=dm)
-        trainer.test(system, datamodule=dm)
+        # trainer.test(system, datamodule=dm)
     elif args.validate:
         trainer.validate(system, datamodule=dm, ckpt_path=args.resume)
     elif args.test:
